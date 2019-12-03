@@ -15,11 +15,15 @@ exports.lookup = function(parameters, res, amount) {
 async function queryItunesApi(url, res, amount) {
   try {
     const { data } = await axios.get(url)
+
     if (amount == 'many') {
       data.results.splice(0, 1)
+       data.results[0].highResImage = res.locals.highResImage
       data.resultCount--
       res.status(200).send(data)
     } else {
+      data.results[0].highResImage = res.locals.highResImage
+      data.highResImage = res.locals.highResImage
       res.status(200).send(data)
     }
   } catch (err) {

@@ -8,14 +8,13 @@ const cors = require('cors')
 const passport = require('passport')
 
 const mongoose = require('mongoose')
-const mongoUriFromEnv = process.env.DATABASE_URL ? `mongodb://${process.env.DATABASE_URL}` : process.env.MONGOLAB_URI
+const mongoUriFromEnv = process.env.DATABASE_URL
+  ? `mongodb://${process.env.DATABASE_URL}`
+  : process.env.MONGOLAB_URI
 const mongoUri = mongoUriFromEnv || 'mongodb://localhost/ubeat'
-mongoose.connect(
-  mongoUri,
-  {
-    autoReconnect: true
-  }
-)
+mongoose.connect(mongoUri, {
+  autoReconnect: true
+})
 
 const authentication = require('./middleware/authentication')
 const login = require('./routes/login')
@@ -26,6 +25,7 @@ const lookup = require('./routes/lookup')
 const playlist = require('./routes/playlists')
 const status = require('./routes/status')
 
+const discogs = require('./routes/discogs')
 const app = express()
 const corsOptions = {
   origin: '*',
@@ -70,6 +70,7 @@ app.use(function(error, req, res, next) {
 })
 
 app.get('/', status.getHome)
+
 app.get('/status', status.getStatus)
 app.get('/login', login.showLoginPage)
 app.post('/login', passport.authenticate('local-login'), login.getToken)
@@ -115,8 +116,14 @@ app.put('/playlists/:id', authentication.isAuthenticated, playlist.updatePlaylis
 
 // Unsecure API (Will be removed after release 2)
 app.get('/unsecure/search', search.search)
+
+app.use('/unsecure/search/albums', discogs.album)
 app.get('/unsecure/search/albums', search.searchByAlbum)
+
+app.use('/unsecure/search/artists', discogs.artist)
 app.get('/unsecure/search/artists', search.searchByArtist)
+
+
 app.get('/unsecure/search/tracks', search.searchByTrack)
 app.get('/unsecure/search/users', user.findByName)
 
@@ -130,8 +137,10 @@ app.delete('/unsecure/follow/:id', user.unfollow)
 app.get('/unsecure/tracks/:id', lookup.getTrack)
 app.get('/unsecure/albums/:id', lookup.getAlbum)
 app.get('/unsecure/albums/:id/tracks', lookup.getAlbumTracks)
+
 app.get('/unsecure/artists/:id', lookup.getArtist)
 app.get('/unsecure/artists/:id/albums', lookup.getArtistAlbums)
+
 app.get('/unsecure/playlists', playlist.getPlaylists)
 app.post('/unsecure/playlists', playlist.createPlaylistUnsecure)
 app.delete('/unsecure/playlists/:id', playlist.removePlaylistUnsecure)
