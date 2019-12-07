@@ -103,10 +103,11 @@ app.post('/follow', authentication.isAuthenticated, user.follow)
 app.delete('/follow/:id', authentication.isAuthenticated, user.unfollow)
 
 app.get('/tracks/:id', authentication.isAuthenticated, lookup.getTrack)
+app.get('(/albums/:id/tracks)', authentication.isAuthenticated, lookup.getAlbumTracks)
+
 app.get('/albums/:id', authentication.isAuthenticated, lookup.getAlbum)
 app.use('/albums/:id', discogs.album)
 
-app.get('/albums/:id/tracks', authentication.isAuthenticated, lookup.getAlbumTracks)
 
 app.get('(/artists/:id/albums)', authentication.isAuthenticated, lookup.getArtistAlbums)
 app.use('(/artists/:id/albums)', discogs.album)
@@ -148,11 +149,13 @@ app.get('/unsecure/users/:id/playlists', user.getPlaylistsByUser)
 app.post('/unsecure/follow', user.follow)
 app.delete('/unsecure/follow/:id', user.unfollow)
 
-app.get('/unsecure/tracks/:id', lookup.getTrack)
-app.get('/unsecure/albums/:id', lookup.getAlbum)
-app.use('/unsecure/albums/:id', discogs.album)
 
-app.get('/unsecure/albums/:id/tracks', lookup.getAlbumTracks)
+app.get('/unsecure/tracks/:id', lookup.getTrack)
+app.get('(/unsecure/albums/:id/tracks)', lookup.getAlbumTracks)
+
+app.get('(/unsecure/albums/:id)', lookup.getAlbum)
+app.use('(/unsecure/albums/:id)', discogs.album)
+
 
 app.get('(/unsecure/artists/:id/albums)', lookup.getArtistAlbums)
 app.use('(/unsecure/artists/:id/albums)', discogs.album)
