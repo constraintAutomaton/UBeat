@@ -11,7 +11,7 @@ exports.getTrack = function(req, res) {
   )
 }
 
-exports.getAlbum = function(req, res,next) {
+exports.getAlbum = function(req, res, next) {
   itunes.lookup(
     {
       id: req.params.id,
@@ -48,13 +48,17 @@ exports.getArtist = function(req, res, next) {
   )
 }
 
-exports.getArtistAlbums = function(req, res) {
+exports.getArtistAlbums = function(req, res,next) {
+  console.log('ok')
   itunes.lookup(
     {
       id: req.params.id,
       entity: 'album'
     },
     res,
-    'many'
+    'many',
+    false,
+    next,
+    true
   )
 }

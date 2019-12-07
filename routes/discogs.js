@@ -2,27 +2,37 @@ const axios = require('axios')
 const PUBLIC_API_KEY = 'kGpyEfufJNVCCSjcBrtQFmJMxcrlSXrtfxgBfzHI'
 const rootUrl = 'https://api.discogs.com/'
 exports.album = async (req, res, next) => {
-  const query = req.query.q !=undefined?req.query.q:res.locals.data.results[0].collectionName
-  const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
-  try {
-    const { data } = await axios.get(url)
-    res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
-    if (res.locals.send != undefined) {
-      res.locals.data.results[0].highResImage = res.locals.highResImage
-      res.locals.data.results[0].bio = res.locals.bio
+  if (res.locals.isAlbumArtist == undefined) {
+    const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].collectionName
+    const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
+    try {
+      const { data } = await axios.get(url)
+      res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
+      if (res.locals.send != undefined) {
+        res.locals.data.results[0].highResImage = res.locals.highResImage
+        res.locals.data.results[0].bio = res.locals.bio
 
-      res.send(res.locals.data)
-    } else {
-      next()
+        res.send(res.locals.data)
+      } else {
+        next()
+      }
+    } catch (err) {
+      console.error(err && err.response && res.status(err.response.status).send(err.response.data))
+      err && err.response && res.status(err.response.status).send(err.response.data)
+      res.send(err)
     }
-  } catch (err) {
-    console.error(err && err.response && res.status(err.response.status).send(err.response.data))
-    err && err.response && res.status(err.response.status).send(err.response.data)
-    res.send(err)
+  } else {
+    for (i in res.locals.data.results) {
+      const el = res.locals.data.results[i]
+      const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${el.collectionName}&format=album`
+      const { data } = await axios.get(url)
+      el.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
+    }
+    res.send(res.locals.data)
   }
 }
 exports.artist = async (req, res, next) => {
-  const query = req.query.q !=undefined?req.query.q:res.locals.data.results[0].artistName
+  const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].artistName
   let url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&type=artist`
   try {
     const { data } = await axios.get(url)

@@ -85,8 +85,13 @@ app.get('/tokenInfo', authentication.isAuthenticated, login.getToken)
 
 // Secure API
 app.get('/search', authentication.isAuthenticated, search.search)
+
+app.use('/search/albums', discogs.album)
 app.get('/search/albums', authentication.isAuthenticated, search.searchByAlbum)
+
+app.use('/search/artists', discogs.artist)
 app.get('/search/artists', authentication.isAuthenticated, search.searchByArtist)
+
 app.get('/search/tracks', authentication.isAuthenticated, search.searchByTrack)
 app.get('/search/users', authentication.isAuthenticated, user.findByName)
 
@@ -99,9 +104,18 @@ app.delete('/follow/:id', authentication.isAuthenticated, user.unfollow)
 
 app.get('/tracks/:id', authentication.isAuthenticated, lookup.getTrack)
 app.get('/albums/:id', authentication.isAuthenticated, lookup.getAlbum)
+app.use('/albums/:id', discogs.album)
+
 app.get('/albums/:id/tracks', authentication.isAuthenticated, lookup.getAlbumTracks)
-app.get('/artists/:id', authentication.isAuthenticated, lookup.getArtist)
-app.get('/artists/:id/albums', authentication.isAuthenticated, lookup.getArtistAlbums)
+
+app.get('(/artists/:id/albums)', authentication.isAuthenticated, lookup.getArtistAlbums)
+app.use('(/artists/:id/albums)', discogs.album)
+
+
+app.get('(/artists/:id)', authentication.isAuthenticated, lookup.getArtist)
+app.use('(/artists/:id)', discogs.artist)
+
+
 app.get('/playlists', authentication.isAuthenticated, playlist.getPlaylists)
 app.post('/playlists', authentication.isAuthenticated, playlist.createPlaylist)
 app.delete('/playlists/:id', authentication.isAuthenticated, playlist.removePlaylist)
@@ -140,10 +154,12 @@ app.use('/unsecure/albums/:id', discogs.album)
 
 app.get('/unsecure/albums/:id/tracks', lookup.getAlbumTracks)
 
-app.get('/unsecure/artists/:id', lookup.getArtist)
-app.use('/unsecure/artists/:id', discogs.artist)
+app.get('(/unsecure/artists/:id/albums)', lookup.getArtistAlbums)
+app.use('(/unsecure/artists/:id/albums)', discogs.album)
 
-app.get('/unsecure/artists/:id/albums', lookup.getArtistAlbums)
+app.get('(/unsecure/artists/:id)', lookup.getArtist)
+app.use('(/unsecure/artists/:id)', discogs.artist)
+
 
 app.get('/unsecure/playlists', playlist.getPlaylists)
 app.post('/unsecure/playlists', playlist.createPlaylistUnsecure)

@@ -8,10 +8,10 @@ exports.search = function(parameters, res) {
   queryItunesApi(searchEndPoint + qs.stringify(parameters), res)
 }
 
-exports.lookup = function(parameters, res, amount,send=true,next) {
-  queryItunesApi(lookupEndPoint + qs.stringify(parameters), res, amount,send,next)
+exports.lookup = function(parameters, res, amount,send=true,next=false, isAlbumArtist=false) {
+  queryItunesApi(lookupEndPoint + qs.stringify(parameters), res, amount,send,next,isAlbumArtist)
 }
-async function queryItunesApi(url, res, amount,send=true,next=undefined) {
+async function queryItunesApi(url, res, amount,send=true,next=false, isAlbumArtist=false) {
   try {
     const { data } = await axios.get(url)
 
@@ -32,6 +32,9 @@ async function queryItunesApi(url, res, amount,send=true,next=undefined) {
       }else{
         res.locals.data=data
         res.locals.send = false
+        if(isAlbumArtist===true){
+          res.locals.isAlbumArtist = true
+        }
         
         next()
       }
