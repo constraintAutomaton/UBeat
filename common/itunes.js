@@ -8,10 +8,10 @@ exports.search = function(parameters, res) {
   queryItunesApi(searchEndPoint + qs.stringify(parameters), res)
 }
 
-exports.lookup = function(parameters, res, amount) {
-  queryItunesApi(lookupEndPoint + qs.stringify(parameters), res, amount)
+exports.lookup = function(parameters, res, amount,send=true,next) {
+  queryItunesApi(lookupEndPoint + qs.stringify(parameters), res, amount,send,next)
 }
-async function queryItunesApi(url, res, amount) {
+async function queryItunesApi(url, res, amount,send=true,next=undefined) {
   try {
     const { data } = await axios.get(url)
 
@@ -27,7 +27,15 @@ async function queryItunesApi(url, res, amount) {
         }
       })
       data.resultCount--
-      res.status(200).send(data)
+      if(send===true){
+        res.status(200).send(data)
+      }else{
+        res.locals.data=data
+        res.locals.send = false
+        
+        next()
+      }
+      
     } else {
       data.results.map(el => {
         if (res.locals.highResImage != undefined) {
@@ -38,7 +46,16 @@ async function queryItunesApi(url, res, amount) {
           el.bio = res.locals.bio
         }
       })
-      res.status(200).send(data)
+      if(send===true){
+        res.status(200).send(data)
+      }else{
+        res.locals.data=data
+        
+        res.locals.send = false
+        
+        next()
+      }
+      
     }
   } catch (err) {
     err && err.response && res.status(err.response.status).send(err.response.data)

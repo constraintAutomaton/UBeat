@@ -6,7 +6,12 @@ exports.album = async (req, res, next) => {
   try {
     const { data } = await axios.get(url)
     res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
-    next()
+    if (res.locals.send != undefined) {
+      console.log("OK")
+      res.send(res.locals.data)
+    } else {
+      next()
+    }
   } catch (err) {
     console.error(err && err.response && res.status(err.response.status).send(err.response.data))
     err && err.response && res.status(err.response.status).send(err.response.data)
@@ -14,6 +19,7 @@ exports.album = async (req, res, next) => {
   }
 }
 exports.artist = async (req, res, next) => {
+  console.log("ici")
   let url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${req.query.q}&type=artist`
   try {
     const { data } = await axios.get(url)
@@ -28,7 +34,12 @@ exports.artist = async (req, res, next) => {
       res.locals.bio = data.profile
     }
 
-    next()
+    if (res.locals.send != undefined) {
+      console.log("OK")
+      res.send(res.locals.data)
+    } else {
+      next()
+    }
   } catch (err) {
     console.error(err && err.response && res.status(err.response.status).send(err.response.data))
     err && err.response && res.status(err.response.status).send(err.response.data)

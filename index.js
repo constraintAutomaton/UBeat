@@ -139,6 +139,8 @@ app.get('/unsecure/albums/:id', lookup.getAlbum)
 app.get('/unsecure/albums/:id/tracks', lookup.getAlbumTracks)
 
 app.get('/unsecure/artists/:id', lookup.getArtist)
+app.use('/unsecure/artists/:id', discogs.artist)
+
 app.get('/unsecure/artists/:id/albums', lookup.getArtistAlbums)
 
 app.get('/unsecure/playlists', playlist.getPlaylists)

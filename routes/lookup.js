@@ -33,14 +33,16 @@ exports.getAlbumTracks = function(req, res) {
   )
 }
 
-exports.getArtist = function(req, res) {
+exports.getArtist = function(req, res, next) {
   itunes.lookup(
     {
       id: req.params.id,
       entity: 'musicArtist'
     },
     res,
-    'single'
+    'single',
+    false,
+    next
   )
 }
 
