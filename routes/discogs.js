@@ -35,11 +35,16 @@ exports.artist = async (req, res, next) => {
   const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].artistName
   let url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&type=artist`
   try {
+
     const { data } = await axios.get(url)
+    console.log(data)
+    console.log(data.results.length !=0)
 
-    const id = data != undefined ? data.results[0].id : undefined
+    const id = data.results != undefined && data.results.length !=0 ? data.results[0].id : false
+    console.log("here!")
 
-    if (id != undefined) {
+
+    if (id != false) {
       url = `${rootUrl}artists/${id}?token=${PUBLIC_API_KEY}`
       console.log(url)
       let { data } = await axios.get(url)
@@ -48,8 +53,8 @@ exports.artist = async (req, res, next) => {
     }
 
     if (res.locals.send != undefined) {
-      res.locals.data.results[0].highResImage = res.locals.highResImage
-      res.locals.data.results[0].bio = res.locals.bio
+      res.locals.data.results[0].highResImage = res.locals.highResImage!=undefined?res.locals.highResImage:""
+      res.locals.data.results[0].bio = res.locals.bio!=undefined?res.locals.bio:""
 
       res.send(res.locals.data)
     } else {
