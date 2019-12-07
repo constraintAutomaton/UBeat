@@ -136,6 +136,8 @@ app.delete('/unsecure/follow/:id', user.unfollow)
 
 app.get('/unsecure/tracks/:id', lookup.getTrack)
 app.get('/unsecure/albums/:id', lookup.getAlbum)
+app.use('/unsecure/albums/:id', discogs.album)
+
 app.get('/unsecure/albums/:id/tracks', lookup.getAlbumTracks)
 
 app.get('/unsecure/artists/:id', lookup.getArtist)

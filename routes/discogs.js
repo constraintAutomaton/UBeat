@@ -2,12 +2,15 @@ const axios = require('axios')
 const PUBLIC_API_KEY = 'kGpyEfufJNVCCSjcBrtQFmJMxcrlSXrtfxgBfzHI'
 const rootUrl = 'https://api.discogs.com/'
 exports.album = async (req, res, next) => {
-  const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${req.query.q}&format=album`
+  const query = req.query.q !=undefined?req.query.q:res.locals.data.results[0].collectionName
+  const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
   try {
     const { data } = await axios.get(url)
     res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
     if (res.locals.send != undefined) {
-      console.log('OK')
+      res.locals.data.results[0].highResImage = res.locals.highResImage
+      res.locals.data.results[0].bio = res.locals.bio
+
       res.send(res.locals.data)
     } else {
       next()
