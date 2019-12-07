@@ -22,8 +22,10 @@ exports.artist = async (req, res, next) => {
 
     if (id != undefined) {
       url = `${rootUrl}artists/${id}?token=${PUBLIC_API_KEY}`
+      console.log(url)
       let { data } = await axios.get(url)
       res.locals.highResImage = data.images === undefined ? '' : data.images[0].uri
+      res.locals.bio = data.profile
     }
 
     next()
