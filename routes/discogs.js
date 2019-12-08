@@ -23,11 +23,20 @@ exports.album = async (req, res, next) => {
     }
   } else {
     for (i in res.locals.data.results) {
+      if (String(i) === "5") {
+        break
+      }
+      console.log(i)
       const el = res.locals.data.results[i]
       const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${el.collectionName}&format=album`
       const { data } = await axios.get(url)
-      el.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
+      el.highResImage =
+        data.results != undefined && data.results.length != 0 ? data.results[0].cover_image : ''
+      if (el.highResImage === '') {
+        break
+      }
     }
+    console.log(Promise.all(res.locals.data))
     res.send(res.locals.data)
   }
 }
@@ -35,14 +44,10 @@ exports.artist = async (req, res, next) => {
   const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].artistName
   let url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&type=artist`
   try {
-
     const { data } = await axios.get(url)
-    console.log(data)
-    console.log(data.results.length !=0)
 
-    const id = data.results != undefined && data.results.length !=0 ? data.results[0].id : false
-    console.log("here!")
-
+    const id = data.results != undefined && data.results.length != 0 ? data.results[0].id : false
+    console.log('here!')
 
     if (id != false) {
       url = `${rootUrl}artists/${id}?token=${PUBLIC_API_KEY}`
@@ -53,8 +58,9 @@ exports.artist = async (req, res, next) => {
     }
 
     if (res.locals.send != undefined) {
-      res.locals.data.results[0].highResImage = res.locals.highResImage!=undefined?res.locals.highResImage:""
-      res.locals.data.results[0].bio = res.locals.bio!=undefined?res.locals.bio:""
+      res.locals.data.results[0].highResImage =
+        res.locals.highResImage != undefined ? res.locals.highResImage : ''
+      res.locals.data.results[0].bio = res.locals.bio != undefined ? res.locals.bio : ''
 
       res.send(res.locals.data)
     } else {
