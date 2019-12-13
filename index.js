@@ -132,6 +132,9 @@ app.put('/playlists/:id', authentication.isAuthenticated, playlist.updatePlaylis
 // Unsecure API (Will be removed after release 2)
 app.get('/unsecure/search', search.search)
 
+app.post('/unsecure/search/extra', discogs.search)
+
+
 app.use('/unsecure/search/albums', discogs.album)
 app.get('/unsecure/search/albums', search.searchByAlbum)
 
@@ -155,7 +158,6 @@ app.get('(/unsecure/albums/:id/tracks)', lookup.getAlbumTracks)
 
 app.get('(/unsecure/albums/:id)', lookup.getAlbum)
 app.use('(/unsecure/albums/:id)', discogs.album)
-
 
 app.get('(/unsecure/artists/:id/albums)', lookup.getArtistAlbums)
 app.use('(/unsecure/artists/:id/albums)', discogs.album)
