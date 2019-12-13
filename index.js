@@ -10,7 +10,7 @@ const passport = require('passport')
 const mongoose = require('mongoose')
 const mongoUriFromEnv = process.env.DATABASE_URL
   ? `mongodb://${process.env.DATABASE_URL}`
-  : process.env.MONGOLAB_URI
+  : process.env.MONGODB_URI
 const mongoUri = mongoUriFromEnv || 'mongodb://localhost/ubeat'
 mongoose.connect(mongoUri, {
   autoReconnect: true
