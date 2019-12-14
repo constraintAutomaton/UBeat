@@ -2,25 +2,24 @@ const axios = require('axios')
 const PUBLIC_API_KEY = 'kGpyEfufJNVCCSjcBrtQFmJMxcrlSXrtfxgBfzHI'
 const rootUrl = 'https://api.discogs.com/'
 exports.album = async (req, res, next) => {
-    const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].collectionName
-    const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
-    try {
-      const { data } = await axios.get(url)
-      res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
-      if (res.locals.send != undefined) {
-        res.locals.data.results[0].highResImage = res.locals.highResImage
-        res.locals.data.results[0].bio = res.locals.bio
+  const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].collectionName
+  const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
+  try {
+    const { data } = await axios.get(url)
+    res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
+    if (res.locals.send != undefined) {
+      res.locals.data.results[0].highResImage = res.locals.highResImage
+      res.locals.data.results[0].bio = res.locals.bio
 
-        res.send(res.locals.data)
-      } else {
-        next()
-      }
-    } catch (err) {
-      console.error(err && err.response && res.status(err.response.status).send(err.response.data))
-      err && err.response && res.status(err.response.status).send(err.response.data)
-      res.send(err)
+      res.send(res.locals.data)
+    } else {
+      next()
     }
-  
+  } catch (err) {
+    console.error(err && err.response && res.status(err.response.status).send(err.response.data))
+    err && err.response && res.status(err.response.status).send(err.response.data)
+    res.send(err)
+  }
 }
 exports.artist = async (req, res, next) => {
   const query = req.query.q != undefined ? req.query.q : res.locals.data.results[0].artistName
@@ -54,23 +53,51 @@ exports.artist = async (req, res, next) => {
     res.send(err)
   }
 }
-exports.search = async(req,res) =>{
-  console.log(req.body)
-  const resData ={results:[]}
-  for (i in req.body.query) {
-    if (String(i) === "5") {
-      break
-    }
-    console.log(i)
-    const el =req.body.query[i]
-    const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${el}&format=album`
-    const { data } = await axios.get(url)
-    const highResImage = data.results != undefined && data.results.length != 0 ? data.results[0].cover_image : ''
+const search = async (req, res, mode) => {
+  try {
+    const resData = { results: [] }
+    for (i in req.body.query) {
+      if (String(i) === '5') {
+        break
+      }
+      const el = req.body.query[i]
+      const url =
+        mode === 'album'
+          ? `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${el}&format=album`
+          : `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${el}&type=artist`
+      const { data } = await axios.get(url)
+      let highResImage = ''
+      let bio = ''
+      if (mode === 'album') {
+        highResImage =
+          data.results != undefined && data.results.length != 0 ? data.results[0].cover_image : ''
+      } else {
+        const id =
+          data.results != undefined && data.results.length != 0 ? data.results[0].id : false
+        console.log(id)
+        if (id != false) {
+          const url = `${rootUrl}artists/${id}?token=${PUBLIC_API_KEY}`
+          const { data } = await axios.get(url)
+          highResImage = data.images === undefined ? '' : data.images[0].uri
+          bio = data.profile === undefined ? '' : data.profile
+        }
+      }
 
-    resData.results.push({
-      highResImage:highResImage
-    })
-    
+      resData.results.push({
+        highResImage: highResImage,
+        bio: bio
+      })
+    }
+    res.send(resData)
+  } catch (err) {
+    console.error(err && err.response && res.status(err.response.status).send(err.response.data))
+    err && err.response && res.status(err.response.status).send(err.response.data)
+    res.send(err)
   }
-  res.send(resData)
+}
+exports.searchAlbum = async (req, res) => {
+  search(req, res, 'album')
+}
+exports.searchArtist = async (req, res) => {
+  search(req, res, 'artist')
 }
