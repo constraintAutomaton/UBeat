@@ -6,7 +6,7 @@ exports.album = async (req, res, next) => {
   const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
   try {
     const { data } = await axios.get(url)
-    if(data.pagination.items ==="0"){
+    if (data.pagination.items === '0') {
       next()
     }
     res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
@@ -16,14 +16,13 @@ exports.album = async (req, res, next) => {
 
       res.send(res.locals.data)
     } else {
-      console.log(res.locals)
-      console.log("ici!")
       next()
     }
   } catch (err) {
-    console.log("here")
-    next()
     console.error(err && err.response && res.status(err.response.status).send(err.response.data))
+    if (res.locals.send == undefined) {
+      next()
+    }
     err && err.response && res.status(err.response.status).send(err.response.data)
     res.send(err)
   }
@@ -35,11 +34,9 @@ exports.artist = async (req, res, next) => {
     const { data } = await axios.get(url)
 
     const id = data.results != undefined && data.results.length != 0 ? data.results[0].id : false
-    console.log('here!')
 
     if (id != false) {
       url = `${rootUrl}artists/${id}?token=${PUBLIC_API_KEY}`
-      console.log(url)
       let { data } = await axios.get(url)
       res.locals.highResImage = data.images === undefined ? '' : data.images[0].uri
       res.locals.bio = data.profile
@@ -56,6 +53,9 @@ exports.artist = async (req, res, next) => {
     }
   } catch (err) {
     console.error(err && err.response && res.status(err.response.status).send(err.response.data))
+    if (res.locals.send == undefined) {
+      next()
+    }
     err && err.response && res.status(err.response.status).send(err.response.data)
     res.send(err)
   }
@@ -81,7 +81,6 @@ const search = async (req, res, mode) => {
       } else {
         const id =
           data.results != undefined && data.results.length != 0 ? data.results[0].id : false
-        console.log(id)
         if (id != false) {
           const url = `${rootUrl}artists/${id}?token=${PUBLIC_API_KEY}`
           const { data } = await axios.get(url)
