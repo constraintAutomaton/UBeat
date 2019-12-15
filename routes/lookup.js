@@ -57,8 +57,5 @@ exports.getArtistAlbums = function(req, res,next) {
     },
     res,
     'many',
-    false,
-    next,
-    true
   )
 }

@@ -6,6 +6,9 @@ exports.album = async (req, res, next) => {
   const url = `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${query}&format=album`
   try {
     const { data } = await axios.get(url)
+    if(data.pagination.items ==="0"){
+      next()
+    }
     res.locals.highResImage = data.results[0] != undefined ? data.results[0].cover_image : ''
     if (res.locals.send != undefined) {
       res.locals.data.results[0].highResImage = res.locals.highResImage
@@ -13,9 +16,13 @@ exports.album = async (req, res, next) => {
 
       res.send(res.locals.data)
     } else {
+      console.log(res.locals)
+      console.log("ici!")
       next()
     }
   } catch (err) {
+    console.log("here")
+    next()
     console.error(err && err.response && res.status(err.response.status).send(err.response.data))
     err && err.response && res.status(err.response.status).send(err.response.data)
     res.send(err)

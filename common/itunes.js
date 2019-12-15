@@ -24,11 +24,13 @@ async function queryItunesApi(url, res, amount, send = true, next = false, isAlb
 
     if (amount == 'many') {
       data.results.splice(0, 1)
-      if (res.locals.highResImage != undefined) {
-        data.results[0].highResImage = res.locals.highResImage
-      }
-      if (res.locals.bio != undefined) {
-        data.results[0].highResImage = res.locals.bio
+      if (data.resultCount > 0) {
+        if (res.locals.highResImage != undefined) {
+          data.results[0].highResImage = res.locals.highResImage
+        }
+        if (res.locals.bio != undefined) {
+          data.results[0].highResImage = res.locals.bio
+        }
       }
 
       data.resultCount--
@@ -41,15 +43,18 @@ async function queryItunesApi(url, res, amount, send = true, next = false, isAlb
         next()
       }
     } else {
-      if (res.locals.highResImage != undefined) {
-        data.results[0].highResImage = res.locals.highResImage
-      }
+      if (data.resultCount > 0) {
+        if (res.locals.highResImage != undefined) {
+          data.results[0].highResImage = res.locals.highResImage
+        }
 
-      if (res.locals.bio != undefined) {
-        data.results[0].bio = res.locals.bio
+        if (res.locals.bio != undefined) {
+          data.results[0].bio = res.locals.bio
+        }
       }
 
       if (send === true) {
+        console.log(data)
         res.status(200).send(data)
       } else {
         res.locals.data = data

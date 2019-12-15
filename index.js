@@ -113,7 +113,6 @@ app.get('/albums/:id', authentication.isAuthenticated, lookup.getAlbum)
 app.use('/albums/:id', discogs.album)
 
 app.get('(/artists/:id/albums)', authentication.isAuthenticated, lookup.getArtistAlbums)
-app.use('(/artists/:id/albums)', discogs.album)
 
 app.get('(/artists/:id)', authentication.isAuthenticated, lookup.getArtist)
 app.use('(/artists/:id)', discogs.artist)
@@ -159,7 +158,6 @@ app.get('(/unsecure/albums/:id)', lookup.getAlbum)
 app.use('(/unsecure/albums/:id)', discogs.album)
 
 app.get('(/unsecure/artists/:id/albums)', lookup.getArtistAlbums)
-app.use('(/unsecure/artists/:id/albums)', discogs.album)
 
 app.get('(/unsecure/artists/:id)', lookup.getArtist)
 app.use('(/unsecure/artists/:id)', discogs.artist)
