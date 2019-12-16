@@ -63,11 +63,14 @@ exports.artist = async (req, res, next) => {
 const search = async (req, res, mode) => {
   try {
     const resData = { results: [] }
-    for (i in req.body.query) {
+    //console.log(req.body.query)
+    //let query = JSON.parse(req.body.query)
+   const query =req.body.query
+    for (i in query) {
       if (String(i) === '8') {
         break
       }
-      const el = req.body.query[i]
+      const el = query[i]
       const url =
         mode === 'album'
           ? `${rootUrl}database/search?token=${PUBLIC_API_KEY}&q=${el}&format=album`
